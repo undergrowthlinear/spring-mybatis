@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<!-- Used by the mto client to fetch the frame -->
+<mapper
+	namespace="com.undergrowth.mapper.PackFrameMapper.xml">
+	<insert id="insertPack">
+		insert into GSMS_MSG_PACK
+		(USER_ID,ENTERPRISE_ID,ID,BATCH_NAME,SEND_TYPE,MSG_TYPE,BIZ_TYPE,SPEC_NUM,CUSTOM_NUM,SCHEDULE_TIME,DEADLINE,POST_TIME,BOE_TIME,EOE_TIME,STATE,VALID_FRAME_COUNT,VALID_TICKETS,INVALID_TICKETS,COMMIT_FROM,REMARK)
+		values
+		(#{userID},#{entID},#{pack.uuid},#{pack.batchName},
+		#{pack.sendType},#{pack.msgType},#{pack.bizType},
+		#{pack.specNum},#{pack.customNum},#{pack.scheduleTime},#{pack.deadline},#{pack.postTime},#{pack.boeTime},#{pack.eoeTime},#{pack.state.index},#{pack.validFrameCount},#{pack.validTicketCount},#{pack.inValidTicketCount},#{pack.from},#{pack.remark})
+	</insert>
+
+	<insert id="insertFrame">
+		insert into GSMS_MSG_FRAME
+		(ID,MSG_PACK_ID,USER_ID,ENTERPRISE_ID,
+		ASSIGN_SPECSVS_ID,CUSTOM_NUM,MSGCOUNT,CONTENT,MSG_TYPE,BIZ_TYPE,STATE,PRIORITY,SEND_TYPE,BIZ_FORM,LEVEL,POST_TIME,DEADLINE,SCHEDULE_TIME,BOE_TIME,EOE_TIME,STATE_REPORT,PARAMETERS,SMIL_CONTENT,TITLE)
+		values
+		(#{id},#{packUUID},#{userID},#{enterpriseID},#{assignSpecIDs},#{customNum},#{msgCount},#{pack},#{msgType},#{bizType},#{state},#{priority},#{sendType},
+		#{bizForm},#{level},#{postTime},#{deadline},#{scheduleTime},#{boeTime},#{eoeTime},#{reportState},
+		#{parameters},#{smil},#{title})
+	</insert>
+
+	<insert id="insertTicket">
+		insert into GSMS_MSG_TICKET
+		(TICKET_ID, FRAME_ID,
+		PARENT_ID, PACK_ID,
+		USER_ID,ENTERPRISE_ID,BIZ_TYPE,SMS_TYPE,TOTAL,NUMBER,SMS_CONTENT,PHONE,STATE,CUSTOM_MSG_ID,SUBMIT_RESP_TIME,SUF_CONTENT)
+		values
+		(#{ticket.id},
+		#{frame.id},#{ticket.parentID},#{frame.packUUID},#{frame.userID},
+		#{frame.enterpriseID},#{frame.bizType},#{ticket.msgType.index},#{ticket.total},#{ticket.number},
+		#{ticket.content},#{ticket.phone},#{ticket.state.index},#{ticket.customMsgID},#{frame.postTime},#{ticket.sufContent})
+	</insert>
+</mapper>
