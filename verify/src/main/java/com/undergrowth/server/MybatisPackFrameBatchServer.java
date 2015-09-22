@@ -11,9 +11,9 @@ import com.undergrowth.dao.PackFrameStoreDao;
 import com.undergrowth.entity.PMsgPack;
 import com.undergrowth.util.CommonUtils;
 
-public class MybatisPackFrameServer {
+public class MybatisPackFrameBatchServer {
 
-	private static final Logger LOGGER=LoggerFactory.getLogger(MybatisPackFrameServer.class);
+	private static final Logger LOGGER=LoggerFactory.getLogger(MybatisPackFrameBatchServer.class);
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -28,7 +28,7 @@ public class MybatisPackFrameServer {
 		long startTime = System.currentTimeMillis();
 		
 		for (PMsgPack pMsgPack : pMsgPacks) {
-			packFrameStoreDao.storePackOne(pMsgPack);
+			packFrameStoreDao.storePack(pMsgPack);
 		}
 		long endTime = System.currentTimeMillis();
 		

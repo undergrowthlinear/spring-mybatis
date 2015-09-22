@@ -51,6 +51,52 @@ public class PackFrameStoreDao {
 		}
 	}
 
+	public void storePackOne(PMsgPack pack) {
+
+		long startTime = System.currentTimeMillis();
+
+		preHandlePack(pack);
+
+		SqlSession session = sessionFactory.openSession();
+		try {
+			/*
+			 * if (packDeduct != null) { deductPack(account, packDeduct,
+			 * session); }
+			 */
+			PackFrameMapper mapper = session.getMapper(PackFrameMapper.class);
+			Date now = new Date();
+			pack.setPostTime(now);
+
+			try {
+				mapper.insertPack(pack.getUserID(), pack.getEnterpriseID(),
+						pack);
+			} catch (Exception ex) {
+				logger.error("Store pack failed: "+ex.getMessage(),ex);
+				logger.error("the pack has been insert with uuid:"
+						+ pack.getUuid());
+			}
+
+			storeFrameTicket(pack.getUserID(), pack.getEnterpriseID(), pack,
+					mapper, pack.getFrames(), now);
+			/*insertFrameBatch(pack.getUserID(), pack.getEnterpriseID(), pack,
+					mapper, pack.getFrames(), now);*/
+
+			
+			session.commit();
+			long endTime = System.currentTimeMillis();
+			logger.info("每一个包处理的开始时间:" + startTime + "\t结束时间:" + endTime + "\t总共耗时:"
+					+ (endTime - startTime));
+		} catch (Exception e) {
+			if (session != null)
+				session.rollback();
+			logger.error("Store pack failed: " + e.getMessage(), e);
+		} finally {
+			session.close();
+		}
+
+	}
+	
+	
 	public void storePack(PMsgPack pack) {
 
 		long startTime = System.currentTimeMillis();

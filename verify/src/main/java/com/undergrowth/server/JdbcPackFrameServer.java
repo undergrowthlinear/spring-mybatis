@@ -27,16 +27,16 @@ public class JdbcPackFrameServer {
 		
 		long startTime = System.currentTimeMillis();
 		
-		/*for (PMsgPack pMsgPack : pMsgPacks) {
+		for (PMsgPack pMsgPack : pMsgPacks) {
 			packFrameStoreDao.storePack(pMsgPack);
-		}*/
+		}
 		
-		packFrameStoreDao.storePacks(pMsgPacks);
+		/*packFrameStoreDao.storePacks(pMsgPacks);*/
 		
 		long endTime = System.currentTimeMillis();
 		
 		LOGGER.info("所有包处理的开始时间:" + startTime + "\t结束时间:" + endTime + "\t总共耗时:"
-					+ (endTime - startTime)+"\t平均耗时:"+(endTime - startTime));
+					+ (endTime - startTime)+"\t平均耗时:"+(endTime - startTime)/commonUtils.getNum());
 	}
 
 	

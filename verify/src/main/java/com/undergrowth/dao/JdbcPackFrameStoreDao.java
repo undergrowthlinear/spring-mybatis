@@ -138,6 +138,9 @@ public class JdbcPackFrameStoreDao {
 			Date now = new Date();
 			pack.setPostTime(now);
 
+			conn = getConnection();
+			conn.setAutoCommit(false);
+			ps=conn.prepareStatement(sqlPackInsert);
 			
 			// 处理pack
 			
@@ -147,7 +150,7 @@ public class JdbcPackFrameStoreDao {
 			storeFrameTicket(pack.getUserID(), pack.getEnterpriseID(), pack,
 					pack.getFrames(), now);
 
-			
+			conn.commit();
 			long endTime = System.currentTimeMillis();
 			logger.info("每一个包处理的开始时间:" + startTime + "\t结束时间:" + endTime
 					+ "\t总共耗时:" + (endTime - startTime));
@@ -161,12 +164,12 @@ public class JdbcPackFrameStoreDao {
 	protected void storeFrameTicket(int userID, int enterpriseID,
 			PMsgPack pack, List<PMsgFrame> frames, Date now) {
 		if(frames.size()>0){
-			/*try {
+			try {
 				ps=conn.prepareStatement(sqlFrameInsert);
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}*/
+			}
 			for (PMsgFrame msgFrame : frames) {
 				/*
 				 * if(msgFrame.getBizForm() == BizForm.AUDIT_DOES_NOT_PASS)
@@ -187,9 +190,9 @@ public class JdbcPackFrameStoreDao {
 				msgFrame.setUserID(userID);
 				msgFrame.setEnterpriseID(enterpriseID);
 
-				setFrameValue(psFrame, msgFrame);
+				setFrameValue(ps, msgFrame);
 				try {
-					psFrame.execute();
+					ps.execute();
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
