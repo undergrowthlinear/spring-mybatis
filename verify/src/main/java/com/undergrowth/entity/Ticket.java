@@ -82,6 +82,18 @@ public class Ticket {
 	 * MTO identity
 	 */
 	private int mtoID;
+	
+	private int msgType;
+	
+	
+
+	public int getMsgType() {
+		return msgType;
+	}
+
+	public void setMsgType(int msgType) {
+		this.msgType = msgType;
+	}
 
 	/**
 	 * 话单主键

@@ -38,7 +38,26 @@ public class PMsgFrame {
 	
 	private int state;
 	
+	private String pack;
 	
+	
+	
+	public String getPack() {
+		return pack;
+	}
+
+	public void setPack(String pack) {
+		this.pack = pack;
+	}
+
+	public int getBizForm() {
+		return bizForm;
+	}
+
+	public void setBizForm(int bizForm) {
+		this.bizForm = bizForm;
+	}
+
 	private int sendType;
 	
 	private int bizForm;

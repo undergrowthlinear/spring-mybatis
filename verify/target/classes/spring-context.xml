@@ -34,7 +34,7 @@
 
 
 	<bean id="commonUtils" class="com.undergrowth.util.CommonUtils">
-		<property name="num" value="10"></property>
+		<property name="num" value="5000"></property>
 	</bean>
 
 </beans>

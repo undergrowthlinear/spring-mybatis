@@ -1,36 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper  PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
 <!-- Used by the mto client to fetch the frame -->
-<mapper
-	namespace="com.undergrowth.mapper.PackFrameMapper.xml">
-	<insert id="insertPack">
-		insert into GSMS_MSG_PACK
+<mapper namespace="com.undergrowth.mapper.PackFrameMapper">
+	<insert id="insertPack" statementType="PREPARED">
+		insert into
+		gsms_msg_pack_test_speed
 		(USER_ID,ENTERPRISE_ID,ID,BATCH_NAME,SEND_TYPE,MSG_TYPE,BIZ_TYPE,SPEC_NUM,CUSTOM_NUM,SCHEDULE_TIME,DEADLINE,POST_TIME,BOE_TIME,EOE_TIME,STATE,VALID_FRAME_COUNT,VALID_TICKETS,INVALID_TICKETS,COMMIT_FROM,REMARK)
 		values
 		(#{userID},#{entID},#{pack.uuid},#{pack.batchName},
 		#{pack.sendType},#{pack.msgType},#{pack.bizType},
-		#{pack.specNum},#{pack.customNum},#{pack.scheduleTime},#{pack.deadline},#{pack.postTime},#{pack.boeTime},#{pack.eoeTime},#{pack.state.index},#{pack.validFrameCount},#{pack.validTicketCount},#{pack.inValidTicketCount},#{pack.from},#{pack.remark})
+		#{pack.specNum},#{pack.customNum},#{pack.scheduleTime},#{pack.deadline},#{pack.postTime},#{pack.boeTime},#{pack.eoeTime},
+		#{pack.state},#{pack.validFrameCount},#{pack.validTicketCount},#{pack.inValidTicketCount},#{pack.from},#{pack.remark})
 	</insert>
 
-	<insert id="insertFrame">
-		insert into GSMS_MSG_FRAME
+	<insert id="insertFrame" statementType="PREPARED">
+		insert into
+		gsms_msg_frame_test_speed
 		(ID,MSG_PACK_ID,USER_ID,ENTERPRISE_ID,
 		ASSIGN_SPECSVS_ID,CUSTOM_NUM,MSGCOUNT,CONTENT,MSG_TYPE,BIZ_TYPE,STATE,PRIORITY,SEND_TYPE,BIZ_FORM,LEVEL,POST_TIME,DEADLINE,SCHEDULE_TIME,BOE_TIME,EOE_TIME,STATE_REPORT,PARAMETERS,SMIL_CONTENT,TITLE)
 		values
 		(#{id},#{packUUID},#{userID},#{enterpriseID},#{assignSpecIDs},#{customNum},#{msgCount},#{pack},#{msgType},#{bizType},#{state},#{priority},#{sendType},
 		#{bizForm},#{level},#{postTime},#{deadline},#{scheduleTime},#{boeTime},#{eoeTime},#{reportState},
-		#{parameters},#{smil},#{title})
+		#{parameters,typeHandler=com.undergrowth.util.MapTypeHandler},#{smil},#{title})
+	</insert>
+	
+	<insert id="insertFrameBatch" statementType="PREPARED">
+		insert into
+		gsms_msg_frame_test_speed
+		(ID,MSG_PACK_ID,USER_ID,ENTERPRISE_ID,
+		ASSIGN_SPECSVS_ID,CUSTOM_NUM,MSGCOUNT,CONTENT,MSG_TYPE,BIZ_TYPE,STATE,PRIORITY,SEND_TYPE,BIZ_FORM,LEVEL,POST_TIME,DEADLINE,SCHEDULE_TIME,BOE_TIME,EOE_TIME,STATE_REPORT,PARAMETERS,SMIL_CONTENT,TITLE)
+		values
+		<foreach collection="frames" item="frame" index="index" separator=",">
+		(#{frame.id},#{frame.packUUID},#{frame.userID},#{frame.enterpriseID},#{frame.assignSpecIDs},#{frame.customNum},#{frame.msgCount},
+		#{frame.pack},#{frame.msgType},#{frame.bizType},#{frame.state},#{frame.priority},#{frame.sendType},
+		#{frame.bizForm},#{frame.level},#{frame.postTime},#{frame.deadline},#{frame.scheduleTime},#{frame.boeTime},#{frame.eoeTime},
+		#{frame.reportState},#{frame.parameters,typeHandler=com.undergrowth.util.MapTypeHandler},#{frame.smil},#{frame.title})
+		</foreach>
 	</insert>
 
 	<insert id="insertTicket">
-		insert into GSMS_MSG_TICKET
-		(TICKET_ID, FRAME_ID,
+		insert into gsms_msg_ticket_test_speed
+		(TICKET_ID,
+		FRAME_ID,
 		PARENT_ID, PACK_ID,
 		USER_ID,ENTERPRISE_ID,BIZ_TYPE,SMS_TYPE,TOTAL,NUMBER,SMS_CONTENT,PHONE,STATE,CUSTOM_MSG_ID,SUBMIT_RESP_TIME,SUF_CONTENT)
 		values
 		(#{ticket.id},
 		#{frame.id},#{ticket.parentID},#{frame.packUUID},#{frame.userID},
-		#{frame.enterpriseID},#{frame.bizType},#{ticket.msgType.index},#{ticket.total},#{ticket.number},
+		#{frame.enterpriseID},#{frame.bizType},#{ticket.msgType},#{ticket.total},#{ticket.number},
 		#{ticket.content},#{ticket.phone},#{ticket.state.index},#{ticket.customMsgID},#{frame.postTime},#{ticket.sufContent})
+	</insert>
+
+	<insert id="storeStateReport">
+		insert into gsms_statereport
+		(channel_id,user_id,enterprise_id,pack_id,msg_id,smsc_sequence,dest_phone,submit_time,done_time,result,origin_result,custom_msg_id)
+		values
+		(#{channelID},
+		#{userID},#{enterpriseID},#{packID},#{msgID},#{smscSequence},#{destPhone},#{submitTime},#{doneTime},#{state.index},#{originResult},#{customMsgID})
+	</insert>
+
+
+	<update id="commitTicketStateReport">
+		update gsms_msg_ticket set is_report_result = true,
+		report_result = #{stateReport.state.index}
+		where msg_id =
+		#{stateReport.msgID}
+	</update>
+
+	<insert id="storeMOTicket">
+		insert into gsms_moticket
+		(user_id,enterprise_id,msg_id,spec_number,service_type,phone,content,post_time,sms_type,region_id)
+		values
+		(#{bindUser},#{bindEnterprise},#{msgId},#{specNumber},#{serviceType},#{phone},#{content},#{postTime},#{typeIndex},#{regionId})
 	</insert>
 </mapper>
